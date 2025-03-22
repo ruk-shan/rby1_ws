@@ -1,0 +1,3 @@
+ip_address: "localhost:50051"
+model: "a"
+power_device: ".*"

@@ -1,0 +1,11 @@
+# .gitignore
+# -----------------------------------
+# Ignore the usual ROS 2 build artifacts and logs:
+build/
+install/
+log/
+
+# Ignore this example text file:
+# ros2_readme.txt
+
+
