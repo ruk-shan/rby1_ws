@@ -7,8 +7,15 @@ pip install rby1-sdk
 launch  test_urdf
 ros2 launch rby1_urdf_visualization display.launch.py model:=urdf/test_urdf/01-myfirst.urdf
 
-launch rby1
+launch rby1 with joint-state-publisher-gui
 ros2 launch rby1_urdf_visualization display.launch.py model:=urdf/rby1_urdf/model.urdf
+
+
+
+run point_cloud_pub
+ros2 run point_cloud_pub point_cloud_pub 
+
+
 
 
 pkg rby1_joint_state_pub 
@@ -19,6 +26,5 @@ pkg rby1_joint_state_pub
 
 https://github.com/fzi-forschungszentrum-informatik/ros2_ros_bt_py
 https://fzi-forschungszentrum-informatik.github.io/ros2_ros_bt_py/index.html
-
 
 

@@ -734,6 +734,28 @@
     </link>
 
 
+
+
+
+<!-- link_zvid -->
+    <link name="link_zvid">
+        <inertial>
+            <mass value="0.03585374"/>
+            <origin rpy="0 0 0" xyz="-0.00081966 0.00099024 0.02283704"/>
+            <inertia ixx="0.00002046" ixy="0.00000001" ixz="-0.00000027" iyy="0.00001044" iyz="0.00000076"
+                     izz="0.00001291"/>
+        </inertial>
+
+        <visual>
+            <geometry>
+                <!-- <mesh filename="rby1_urdf_visualization/urdf/rby1_urdf/meshes/PAN_TILT_3.dae"/> -->
+                <mesh filename="package://rby1_urdf_visualization/urdf/rby1_urdf/meshes/zvid.stl" scale="0.1 0.1 0.1"/>
+            </geometry>
+        </visual>
+    </link>
+
+
+
     <!-- Joints -->
     <joint name="right_wheel" type="continuous">
         <parent link="base"/>
@@ -1140,5 +1162,12 @@
       <origin rpy="0.0 0.0 0.0" xyz="0.022 0.0 0.04"/>
       <axis xyz="0 0 1"/>
     </joint> -->
+
+    <joint name="zvid" type="fixed">
+      <parent link="link_head_2"/>
+      <child link="link_zvid"/>
+      <origin rpy="-1.5708 0.0 1.5708" xyz="0.022 0.0 0.04"/>
+      <axis xyz="0 0 0"/>
+    </joint>
 
 </robot>
