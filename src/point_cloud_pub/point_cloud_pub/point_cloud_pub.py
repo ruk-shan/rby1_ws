@@ -21,7 +21,7 @@ class PointCloudPublisher(Node):
         self.timer = self.create_timer(timer_period, self.timer_callback)
         
         # Absolute path to your PLY file.
-        self.ply_file_path = "/home/shan/mywork/RBY1/rby1_ws/src/point_cloud_pub/data/your_mesh.ply"
+        self.ply_file_path = "data/your_mesh.ply"
         self.get_logger().info(f'Reading PLY file from: {self.ply_file_path}')
         
         # Scaling factor for the point cloud.

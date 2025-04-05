@@ -21,40 +21,41 @@ class SimpleJointStatePublisher(Node):
 
         self.joint_names = [
             "right_wheel",
-            "left_wheel"
-            # "torso_0",
-            # "torso_1",
-            # "torso_2",
-            # "torso_3",
-            # "torso_4",
-            # "torso_5",
-            # "right_arm_0",
-            # "right_arm_1",
-            # "right_arm_2",
-            # "right_arm_3",
-            # "right_arm_4",
-            # "right_arm_5",
-            # "right_arm_6",
-            # "left_arm_0",
-            # "left_arm_1",
-            # "left_arm_2",
-            # "left_arm_3",
-            # "left_arm_4",
-            # "left_arm_5",
-            # "left_arm_6",
-            # "gripper_finger_r1",
-            # "gripper_finger_r2",
-            # "gripper_finger_l1",
-            # "gripper_finger_l2",
-            # "head_0",
-            # "head_1"
+            "left_wheel",
+            "torso_0",
+            "torso_1",
+            "torso_2",
+            "torso_3",
+            "torso_4",
+            "torso_5",
+            "right_arm_0",
+            "right_arm_1",
+            "right_arm_2",
+            "right_arm_3",
+            "right_arm_4",
+            "right_arm_5",
+            "right_arm_6",
+            "left_arm_0",
+            "left_arm_1",
+            "left_arm_2",
+            "left_arm_3",
+            "left_arm_4",
+            "left_arm_5",
+            "left_arm_6",
+            "head_0",
+            "head_1",
+            "gripper_finger_r1",
+            "gripper_finger_r2",
+            "gripper_finger_l1",
+            "gripper_finger_l2",
+            
         ]
 
     def connect_to_robot(self):
-        model ='a'
-        power_device= '.*'
-        address = "localhost:50051"
-        self.robot = rby1_sdk.create_robot(address, model)
+        # address = "localhost:50051"
+        address = "192.168.12.1:50051"
+        power_device = ".*"
+        self.robot = rby1_sdk.create_robot_a(address)
         self.robot.connect()
         if not self.robot.is_connected():
             print("Robot is not connected")
@@ -65,11 +66,12 @@ class SimpleJointStatePublisher(Node):
                 print("Failed to power on")
                 exit(1)
 
-    def receive_joint_states(self):
-
+    # def receive_joint_states(self):
+    def get_states(self):
         if self.robot_socket: 
             self.np.set_printoptions(precision=3, suppress=True, floatmode='fixed')
             print(self.robot_state)
+            return self.robot_state
 
 
     def timer_callback(self):
@@ -78,18 +80,28 @@ class SimpleJointStatePublisher(Node):
         msg.name = self.joint_names  
 
         # Get joint positions from the dummy robot communication
-        robot_state = self.robot.get_state()
-        print(robot_state)
-        # joint_positions = self.receive_joint_states()
-        # msg.position = joint_positions # Set positions from robot data
-        # print (joint_positions)
+        # robot_state = self.robot.get_state()
+        # print(robot_state)
+
+
+        joint_positions = self.robot.get_state().position
+        # print (len(joint_positions))
+        
+        new_elements = [0.0, 0.0, 0.0 , 0.0]
+        all_joint_positions = list(joint_positions) + new_elements 
+        print (len(all_joint_positions))
+        print (all_joint_positions)
+
+
+        msg.position = all_joint_positions # Set positions from robot data
+        # print (len(all_joint_positions))
 
         # msg.velocity = []  # Optional, can be empty if not publishing velocity
         # msg.effort = []    # Optional, can be empty if not publishing effort
 
-        # self.publisher_.publish(msg)
-        # self.get_logger().info(f'Publishing Joint States for {len(self.joint_names)} joints') # Optional logging
-        # self.i += 0.1
+        self.publisher_.publish(msg)
+        self.get_logger().info(f'Publishing Joint States for {len(self.joint_names)} joints') # Optional logging
+
 
 def main(args=None):
     rclpy.init(args=args)
