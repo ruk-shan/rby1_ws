@@ -310,18 +310,18 @@ def main(address, power_device, servo):
 
     if not move_arms_up(robot):
         print("finish motion")
-    # if not example_forward_command(robot):
-    #     print("finish motion")
+    if not example_forward_command(robot):
+         print("finish motion")
     if not move_both_arms_cartesian(robot, (0.5,0.14,-0.1,0,0,-1.5708), (0.5,-0.14,-0.1,0,0,1.5708)):
         print("finish motion")
     if not move_both_arms_cartesian(robot, (0.5,0.14,-0.18,0,0,-1.5708), (0.5,-0.14,-0.18,0,0,1.5708)):
         print("finish motion")
     
-    i=0
-    while(i<100):
-        if not example_impedance_control_command_1(robot, (0.5,0.18,-0.18,0,0,-1.5708), (0.5,-0.18,-0.18,0,0,1.5708), 100, 100, 1000, 50, 100, 50, 100, 100, 1000, 50, 100, 50):
-            print("finish motion")
-        i=i+1
+    # i=0
+    # while(i<100):
+    #     if not example_impedance_control_command_1(robot, (0.5,0.18,-0.18,0,0,-1.5708), (0.5,-0.18,-0.18,0,0,1.5708), 100, 100, 1000, 50, 100, 50, 100, 100, 1000, 50, 100, 50):
+    #         print("finish motion")
+    #     i=i+1
 
 
 if __name__ == "__main__":
