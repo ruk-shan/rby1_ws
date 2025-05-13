@@ -1,0 +1,7 @@
+[submodule "src/usb_cam"]
+	path = src/usb_cam
+	url = https://github.com/ros-drivers/usb_cam.git
+
+[submodule "src/ros2_aruco"]
+	path = src/ros2_aruco
+	url = https://github.com/JMU-ROBOTICS-VIVA/ros2_aruco.git
