@@ -7,24 +7,22 @@ pip install rby1-sdk
 launch  test_urdf
 ros2 launch rby1_urdf_visualization display.launch.py model:=urdf/test_urdf/01-myfirst.urdf
 
-launch rby1 with joint-state-publisher-gui
+launch rby1 without joint-state-publisher-gui
 ros2 launch rby1_urdf_visualization display.launch.py model:=urdf/rby1_urdf/model.urdf
 
+run joint state pub 
+ip is hardcoded
+python3 src/rby1_joint_state_publisher/rby1_joint_state_publisher/rby1_state_pub.py
 
-launch rby1 with out joint-state-publisher-gui
+
+launch rby1 with joint-state-publisher-gui
 ros2 launch rby1_urdf_visualization display_with_joint_gui.launch.py  model:=urdf/rby1_urdf/model.urdf
 
 
 run point_cloud_pub
 ros2 run point_cloud_pub point_cloud_pub 
 
-run joint state pub 
-ip is hardcoded
-python3 src/rby1_joint_state_publisher/rby1_joint_state_publisher/rby1_state_pub.py 
-
-
-
-
+ 
 pkg rby1_joint_state_pub 
     rby1_state_pub.py >  config file (to get ip address, ect.) is located at src folder and path is hardcoded. Pls update manually. 
 

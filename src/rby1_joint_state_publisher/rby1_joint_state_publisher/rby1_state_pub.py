@@ -52,8 +52,8 @@ class SimpleJointStatePublisher(Node):
         ]
 
     def connect_to_robot(self):
-        # address = "localhost:50051"
-        address = "192.168.12.1:50051"
+        address = "localhost:50051"
+        # address = "192.168.12.1:50051"
         power_device = ".*"
         self.robot = rby1_sdk.create_robot_a(address)
         self.robot.connect()

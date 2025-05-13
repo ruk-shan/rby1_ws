@@ -1166,7 +1166,8 @@
     <joint name="zvid" type="fixed">
       <parent link="link_head_2"/>
       <child link="link_zvid"/>
-      <origin rpy="-1.5708 0.0 1.5708" xyz="0.022 0.0 0.04"/>
+      <!-- <origin rpy="-1.5708 0.0 1.5708" xyz="0.022 0.0 0.04"/> -->
+            <origin rpy="-1.5708 0.0 1.5708" xyz="0.0 0.0 0.04"/>
       <axis xyz="0 0 0"/>
     </joint>
 
