@@ -1,0 +1,26 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/shan/mywork/RBY1/rby1_ws/install/usb_cam/include/**",
+        "/home/shan/mywork/RBY1/rby1_ws/install/ros2_aruco_interfaces/include/**",
+        "/home/shan/ROS/issac/IsaacSim-ros_workspaces/humble_ws/install/isaac_ros2_messages/include/**",
+        "/home/shan/ROS/issac/IsaacSim-ros_workspaces/humble_ws/install/custom_message/include/**",
+        "/home/shan/ROS/humble_ws/install/manipulator_custom_msgs/include/**",
+        "/opt/ros/humble/include/**",
+        "/home/shan/mywork/RBY1/rby1_ws/src/usb_cam/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

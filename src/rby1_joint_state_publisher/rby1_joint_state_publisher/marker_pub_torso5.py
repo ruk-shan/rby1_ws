@@ -37,27 +37,28 @@ def rotate_vector_by_quaternion(vector, q):
     rz = r20 * x + r21 * y + r22 * z
     return rx, ry, rz
 
-class MarkerPublisher(Node):
+class MarkerPublisherTorso5(Node):
     def __init__(self):
-        super().__init__('marker_publisher')
+        super().__init__('marker_publisher_torso5')
 
         # Declare parameters for the marker's frame and 6D pose.
-        # self.declare_parameter('frame_id', 'link_torso_5')
-        self.declare_parameter('frame_id', 'link_camera_frame')
-        self.declare_parameter('marker_x', 0.0)
-        self.declare_parameter('marker_y', -0.220010)
-        self.declare_parameter('marker_z', -0.606727)
-        self.declare_parameter('marker_roll', 0)
-        self.declare_parameter('marker_pitch', 0)
-        self.declare_parameter('marker_yaw', 0)
-# 0.3,0.27,-0.15,0,-1.5708,-1.65806)
-#  [-2.248156, -1.570669, 0.590080]
+        self.declare_parameter('frame_id', 'torso_5')
+        self.declare_parameter('marker_x', 0.3)
+        self.declare_parameter('marker_y', 0.27)
+        self.declare_parameter('marker_z', -0.15)
+        self.declare_parameter('marker_roll', 0.0)
+        self.declare_parameter('marker_pitch', -1.5708)  # -90 degrees in radians
+        self.declare_parameter('marker_yaw', -1.65806)   # -95 degrees in radians
+        self.declare_parameter('publish_rate', 1.0)      # Hz
 
         # Create a publisher for visualization markers.
         self.publisher_ = self.create_publisher(Marker, 'visualization_marker', 10)
 
         # Timer to update markers.
-        self.timer = self.create_timer(1.0, self.timer_callback)
+        publish_rate = self.get_parameter('publish_rate').get_parameter_value().double_value
+        self.timer = self.create_timer(1.0 / publish_rate, self.timer_callback)
+        
+        self.get_logger().info(f"Marker publisher for torso_5 frame initialized. Publishing at {publish_rate} Hz.")
 
     def timer_callback(self):
         # Read parameters.
@@ -149,21 +150,12 @@ class MarkerPublisher(Node):
 
         # Log the marker's pose and the endpoints of the axes.
         self.get_logger().info(
-            f"Cube marker pose in {frame_id}: position=({x}, {y}, {z}), orientation(quat)=({qx}, {qy}, {qz}, {qw})"
-        )
-        self.get_logger().info(
-            f"X-axis end: ({x_end.x:.2f}, {x_end.y:.2f}, {x_end.z:.2f})"
-        )
-        self.get_logger().info(
-            f"Y-axis end: ({y_end.x:.2f}, {y_end.y:.2f}, {y_end.z:.2f})"
-        )
-        self.get_logger().info(
-            f"Z-axis end: ({z_end.x:.2f}, {z_end.y:.2f}, {z_end.z:.2f})"
+            f"Cube marker pose in {frame_id}: position=({x}, {y}, {z}), orientation(quat)=({qx:.4f}, {qy:.4f}, {qz:.4f}, {qw:.4f})"
         )
 
 def main(args=None):
     rclpy.init(args=args)
-    node = MarkerPublisher()
+    node = MarkerPublisherTorso5()
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()

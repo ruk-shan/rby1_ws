@@ -10,6 +10,7 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        ('share/' + package_name + '/config', ['config/models_config.yaml']),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -21,6 +22,7 @@ setup(
     entry_points={
         'console_scripts': [
             'point_cloud_pub = point_cloud_pub.point_cloud_pub:main',
+            'model_visualizer = point_cloud_pub.model_visualizer:main',
             
         ],
     },

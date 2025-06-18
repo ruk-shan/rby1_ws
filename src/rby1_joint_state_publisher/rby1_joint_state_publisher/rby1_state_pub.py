@@ -52,19 +52,42 @@ class SimpleJointStatePublisher(Node):
         ]
 
     def connect_to_robot(self):
-        address = "localhost:50051"
-        # address = "192.168.12.1:50051"
+
+        address_sim = "localhost:50051"
+        address_real = "192.168.12.1:50051"
         power_device = ".*"
-        self.robot = rby1_sdk.create_robot_a(address)
-        self.robot.connect()
-        if not self.robot.is_connected():
-            print("Robot is not connected")
-            exit(1)
-        if not self.robot.is_power_on(power_device):
-            rv = self.robot.power_on(power_device)
-            if not rv:
-                print("Failed to power on")
+
+        try:
+            print ("trying to connect to real robot")
+            address = address_real
+            self.robot = rby1_sdk.create_robot_a(address)
+
+            self.robot.connect()
+                
+            if not self.robot.is_connected():
+                print("Robot is not connected")
                 exit(1)
+            if not self.robot.is_power_on(power_device):
+                rv = self.robot.power_on(power_device)
+                if not rv:
+                    print("Failed to power on")
+                    exit(1)
+        except: 
+            print ("trying to connect to sim robot")
+            address = address_sim
+            self.robot = rby1_sdk.create_robot_a(address)
+
+            self.robot.connect()
+                
+            if not self.robot.is_connected():
+                print("Robot is not connected")
+                exit(1)
+            if not self.robot.is_power_on(power_device):
+                rv = self.robot.power_on(power_device)
+                if not rv:
+                    print("Failed to power on")
+                    exit(1)
+
 
     # def receive_joint_states(self):
     def get_states(self):

@@ -1,3 +1,22 @@
+#################################################################################################################################
+run >> 
+python3 src/rby1_joint_state_publisher/rby1_joint_state_publisher/rby1_state_pub.py
+ros2 launch rby1_urdf_visualization display.launch.py model:=urdf/rby1_urdf/model.urdf
+python3 /home/shan/mywork/RBY1/rby1_ws/src/rby1_joint_state_publisher/rby1_joint_state_publisher/marker_pub.py 
+ros2 run rby1_joint_state_publisher odom_publisher
+python3 /home/shan/mywork/RBY1/rby1_ws/src/other_tools/fk_solver_03.py
+python3 /home/shan/mywork/RBY1/rby1_ws/src/rby1_joint_state_publisher/rby1_joint_state_publisher/marker_pub.py
+
+#################################################################################################################################
+
+ssh 
+shan@shan-Precision-7670:~$ ssh nvidia@192.168.0.101
+password nvidia
+
+#################################################################################################################################
+
+
+
 packages 
 
 sudo apt install ros-humble-xacro

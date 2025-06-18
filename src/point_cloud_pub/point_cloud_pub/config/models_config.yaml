@@ -1,0 +1,19 @@
+models:
+  - name: "box1"
+    path: "package://point_cloud_pub/meshes/box.dae"  # or .stl
+    # frame_id: "base"
+    frame_id: "link_camera_frame"
+    position: [0.0, 0.0, 0.0]  # x, y, z
+    orientation_rpy: [0.0, 0.0, 0.0]  # roll, pitch, yaw in radians
+    scale: [0.1, 0.1, 0.1]  # x, y, z scale factors
+    enabled: true
+    # color: [0.5, 1.0, 0.5, 1.0]  # Optional: RGBA
+
+  # - name: "robot_arm"
+  #   path: "package://point_cloud_pub/meshes/arm.stl"
+  #   frame_id: "arm_base"
+  #   position: [0.0, 0.0, 0.0]
+  #   orientation_rpy: [0.0, 0.0, 0.0]  # roll, pitch, yaw in radians
+  #   scale: [1.0, 1.0, 1.0]
+  #   enabled: true
+  #   # color: [0.8, 0.2, 0.2, 0.8]  # Optional: RGBA

@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'rby1_joint_state_publisher'
+package_name = 'kinematics_solver'
 
 setup(
     name=package_name,
@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'odom_publisher = rby1_joint_state_publisher.odom_publisher:main',
+            'transform_listener = kinematics_solver.transform_listener_node:main',
+            'camera_to_torso_transform = kinematics_solver.camera_to_torso_transform:main',
         ],
     },
 )

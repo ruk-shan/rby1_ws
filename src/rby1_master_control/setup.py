@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'rby1_joint_state_publisher'
+package_name = 'rby1_master_control'
 
 setup(
     name=package_name,
@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'odom_publisher = rby1_joint_state_publisher.odom_publisher:main',
+            'master_control = rby1_master_control.master_control:main'
         ],
     },
 )
