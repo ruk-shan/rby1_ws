@@ -13,6 +13,9 @@ from std_msgs.msg import ColorRGBA
 import zivid
 from tf2_ros import TransformBroadcaster, Buffer, TransformListener
 import math
+import cv2
+import cv2.aruco as aruco
+from scipy.spatial.transform import Rotation as R
 
 def quaternion_to_euler(x, y, z, w):
     """
@@ -42,17 +45,48 @@ class ArucoMarkerVisualizer(Node):
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
         self.tf_broadcaster = TransformBroadcaster(self)
+        
+        # Camera intrinsics
+        self.camera_matrix = np.array([
+            [1240.81872558594, 0.0, 604.823913574219],
+            [0.0, 1240.64428710938, 509.505249023438],
+            [0.0, 0.0, 1.0]
+        ], dtype=np.float32)
+        
+        # Distortion coefficients
+        self.dist_coeffs = np.array([
+            0.0494324862957001,
+            -0.0316880233585835,
+            -0.000165768535225652,
+            -1.67045436683111e-05,
+            -0.19348831474781
+        ], dtype=np.float32)
+        
+        # Marker size in meters (35mm = 0.035m)
+        self.marker_size = 0.035  # 35mm
+        
+        # ArUco dictionary and parameters
+        self.aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_6X6_250)
+        self.parameters = aruco.DetectorParameters()
+        
         # Use a latched publisher to ensure RViz gets the marker even if it starts after this node
         self.marker_pub = self.create_publisher(Marker, '/visualization_marker', 10)
         self.timer = self.create_timer(0.05, self.timer_callback)  # 20 Hz for smoother updates
         self.marker_pose = None
         self.marker_id = None
         self.get_logger().info('ArucoMarkerVisualizer node started')
+        self.get_logger().info(f'Using marker size: {self.marker_size*1000:.1f}mm')
     
     def update_marker_pose(self, position, quaternion, marker_id):
         """Update the marker pose that will be published."""
         self.marker_pose = (position, quaternion)
         self.marker_id = marker_id
+        
+        # Log the detected marker position
+        self.get_logger().info(
+            f'Marker {marker_id} detected at position: '
+            f'x={position[0]:.3f}, y={position[1]:.3f}, z={position[2]:.3f}'
+        )
     
     def timer_callback(self):
         """Publish marker at the current pose."""
@@ -71,10 +105,10 @@ class ArucoMarkerVisualizer(Node):
         marker.type = Marker.CUBE
         marker.action = Marker.ADD
         
-        # Set marker size (5cm x 5cm x 5mm)
-        marker.scale.x = 0.05
-        marker.scale.y = 0.05
-        marker.scale.z = 0.005
+        # Set marker size (35mm x 35mm x 5mm)
+        marker.scale.x = self.marker_size  # 35mm
+        marker.scale.y = self.marker_size  # 35mm
+        marker.scale.z = 0.005  # 5mm
         
         # Set marker color (green)
         marker.color.r = 0.0
@@ -94,8 +128,8 @@ class ArucoMarkerVisualizer(Node):
             z=quaternion[2], w=quaternion[3])
             
         # Set the scale of the marker (in meters)
-        marker.scale.x = 0.05  # 5cm
-        marker.scale.y = 0.05  # 5cm
+        marker.scale.x = self.marker_size  # 35mm
+        marker.scale.y = self.marker_size  # 35mm
         marker.scale.z = 0.005  # 5mm
         
         # Set the color to semi-transparent green
@@ -128,7 +162,7 @@ class ArucoMarkerVisualizer(Node):
             m.points = [start, end]
             return m
         
-        # Rotate axis vectors by the marker's quaternion
+        # Function to rotate a vector by a quaternion
         def rotate_vector(v, q):
             # q = [x, y, z, w]
             x, y, z = v
@@ -152,44 +186,27 @@ class ArucoMarkerVisualizer(Node):
             
             return rx, ry, rz
         
-        # Apply 180-degree rotation around X axis (flips Y and Z)
-        # In quaternion: [w, x, y, z] where w = cos(θ/2), (x,y,z) = sin(θ/2)*axis
-        # For 180° around X: [0, 1, 0, 0]
-        flip_quat = [0.0, 1.0, 0.0, 0.0]  # 180° around X
-        
-        # Quaternion multiplication: result = flip_quat * quaternion
-        q1 = flip_quat
-        q2 = quaternion
-        combined_quat = [
-            q1[0]*q2[0] - q1[1]*q2[1] - q1[2]*q2[2] - q1[3]*q2[3],  # w
-            q1[0]*q2[1] + q1[1]*q2[0] + q1[2]*q2[3] - q1[3]*q2[2],  # x
-            q1[0]*q2[2] - q1[1]*q2[3] + q1[2]*q2[0] + q1[3]*q2[1],  # y
-            q1[0]*q2[3] + q1[1]*q2[2] - q1[2]*q2[1] + q1[3]*q2[0]   # z
-        ]
-        
-        # Normalize the quaternion to ensure valid rotation
-        norm = np.sqrt(sum(x*x for x in combined_quat))
-        combined_quat = [x/norm for x in combined_quat]
+        # Use the marker's quaternion for rotation
+        marker_quat = [quaternion[0], quaternion[1], quaternion[2], quaternion[3]]  # x, y, z, w
         
         # Debug output
-        self.get_logger().info(f"Original quat: {quaternion}")
-        self.get_logger().info(f"Flipped quat: {combined_quat}")
+        self.get_logger().info(f"Marker quaternion: {marker_quat}")
         
-        # Create axis vectors and rotate them with the combined quaternion
-        x_axis = rotate_vector((axis_length, 0, 0), combined_quat)
-        y_axis = rotate_vector((0, axis_length, 0), combined_quat)
-        z_axis = rotate_vector((0, 0, axis_length), combined_quat)
+        # Create axis vectors and rotate them with the marker's quaternion
+        x_axis = rotate_vector((axis_length, 0, 0), marker_quat)
+        y_axis = rotate_vector((0, axis_length, 0), marker_quat)
+        z_axis = rotate_vector((0, 0, axis_length), marker_quat)
         
         # Create endpoints for the arrows
         x_end = Point(x=origin.x + x_axis[0], y=origin.y + x_axis[1], z=origin.z + x_axis[2])
         y_end = Point(x=origin.x + y_axis[0], y=origin.y + y_axis[1], z=origin.z + y_axis[2])
         z_end = Point(x=origin.x + z_axis[0], y=origin.y + z_axis[1], z=origin.z + z_axis[2])
         
-        # Create and publish axis markers
+        # Create and publish axis markers (aligned with marker's orientation)
         arrows = [
-            (1, origin, x_end, (1.0, 0.0, 0.0)),  # Red X
-            (2, origin, y_end, (0.0, 1.0, 0.0)),  # Green Y
-            (3, origin, z_end, (0.0, 0.0, 1.0))   # Blue Z
+            (1, origin, x_end, (1.0, 0.0, 0.0)),  # Red X (aligned with marker's X)
+            (2, origin, y_end, (0.0, 1.0, 0.0)),  # Green Y (aligned with marker's Y)
+            (3, origin, z_end, (0.0, 0.0, 1.0))   # Blue Z (aligned with marker's Z)
         ]
         
         for arrow in arrows:
@@ -285,11 +302,9 @@ def get_marker_pose_from_live_camera(visualizer_node) -> None:
                             try:
                                 # Get the 4x4 transformation matrix
                                 transform_matrix = marker_pose.to_matrix()
-                                print(f"Transform matrix:\n{transform_matrix}")
                                 
                                 # Extract position (translation) from the last column
                                 position = transform_matrix[0:3, 3]  # First 3 elements of last column
-                                print(f"Extracted position: {position}")
                                 
                                 # Extract rotation matrix (3x3 top-left)
                                 rotation_matrix = transform_matrix[0:3, 0:3]
@@ -322,8 +337,11 @@ def get_marker_pose_from_live_camera(visualizer_node) -> None:
                                     y = (rotation_matrix[1,2] + rotation_matrix[2,1]) / S
                                     z = 0.25 * S
                                 
+                                # Use the original quaternion without any transformations
                                 quaternion = np.array([x, y, z, w])
-                                print(f"Calculated quaternion: {quaternion}")
+                                # Position is already correctly extracted from the transform matrix
+                                
+
                                 
                             except Exception as e:
                                 print(f"Error processing pose matrix: {e}")

@@ -22,6 +22,7 @@ setup(
         'console_scripts': [
             'transform_listener = kinematics_solver.transform_listener_node:main',
             'camera_to_torso_transform = kinematics_solver.camera_to_torso_transform:main',
+            'fk_solver = kinematics_solver.fk_solver_03:main',
         ],
     },
 )
